@@ -1,16 +1,6 @@
-const CACHE_NAME = 'thrive-shell-v3';
-const APP_SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
-self.addEventListener('install', event => {
-  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)).then(() => self.skipWaiting()));
-});
-self.addEventListener('activate', event => {
-  event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key)))).then(() => self.clients.claim()));
-});
-self.addEventListener('fetch', event => {
-  const request = event.request;
-  if (request.method !== 'GET' || new URL(request.url).origin !== self.location.origin) return;
-  event.respondWith(fetch(request).then(response => {
-    if (response && response.ok) { const copy=response.clone(); caches.open(CACHE_NAME).then(cache=>cache.put(request,copy)); }
-    return response;
-  }).catch(() => caches.match(request).then(cached => cached || caches.match('./index.html'))));
-});
+const CACHE_NAME = 'thrive-shell-v10-1';
+const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
+self.addEventListener('install', event => event.waitUntil((async()=>{const c=await caches.open(CACHE_NAME);await Promise.all(SHELL.map(async u=>{try{await c.add(u)}catch(_){}}));await self.skipWaiting()})()));
+self.addEventListener('activate', event => event.waitUntil((async()=>{for(const k of await caches.keys())if(k.startsWith('thrive-shell-')&&k!==CACHE_NAME)await caches.delete(k);await self.clients.claim()})()));
+self.addEventListener('fetch', event => {const r=event.request;if(r.method!=='GET')return;const u=new URL(r.url);if(u.origin!==self.location.origin)return;if(r.mode==='navigate'){event.respondWith((async()=>{try{const x=await fetch(r);if(x.ok)(await caches.open(CACHE_NAME)).put('./index.html',x.clone());return x}catch(_){return(await caches.match(r))||(await caches.match('./index.html'))||new Response('Thrive is offline. Connect once to load the app.',{status:503})}})());return}event.respondWith((async()=>{const c=await caches.open(CACHE_NAME),old=await c.match(r);try{const fresh=await fetch(r);if(fresh.ok)await c.put(r,fresh.clone());return old||fresh}catch(_){return old||new Response('Offline resource unavailable',{status:503})}})())});
+self.addEventListener('notificationclick',event=>{event.notification.close();event.waitUntil((async()=>{const cs=await self.clients.matchAll({type:'window',includeUncontrolled:true});for(const c of cs)if('focus'in c)return c.focus();if(self.clients.openWindow)return self.clients.openWindow('./')})())});
