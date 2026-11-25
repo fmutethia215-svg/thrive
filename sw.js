@@ -1,4 +1,4 @@
-const CACHE_NAME = 'thrive-shell-v11';
+const CACHE_NAME = 'thrive-shell-v11-1';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 self.addEventListener('install', event => event.waitUntil((async()=>{const c=await caches.open(CACHE_NAME);await Promise.all(SHELL.map(async u=>{try{await c.add(u)}catch(_){}}));await self.skipWaiting()})()));
 self.addEventListener('activate', event => event.waitUntil((async()=>{for(const k of await caches.keys())if(k.startsWith('thrive-shell-')&&k!==CACHE_NAME)await caches.delete(k);await self.clients.claim()})()));
