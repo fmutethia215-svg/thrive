@@ -32,20 +32,3 @@ drop policy if exists "Users can delete own Thrive data" on public.user_data;
 create policy "Users can delete own Thrive data"
   on public.user_data for delete to authenticated
   using ((select auth.uid()) = user_id);
-
-
--- Enable low-latency cross-device updates through Supabase Realtime.
--- Safe to run repeatedly; it adds user_data only if it is not already published.
-do $$
-begin
-  if not exists (
-    select 1
-    from pg_publication_tables
-    where pubname = 'supabase_realtime'
-      and schemaname = 'public'
-      and tablename = 'user_data'
-  ) then
-    alter publication supabase_realtime add table public.user_data;
-  end if;
-end
-$$;
