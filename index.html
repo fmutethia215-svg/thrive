@@ -26,7 +26,7 @@ function msg(t){let el=$('#toast');if(!el)return;el.textContent=t;el.classList.r
 function setSync(t){let el=$('#sync');if(el)el.textContent=t?' · '+t:''}
 function labelFields(){$$('.field').forEach(f=>{let l=f.querySelector('label'),c=f.querySelector('input,select,textarea');if(l&&c){c.id=c.id||'fld'+(++lblN);l.htmlFor=c.id}})}
 async function hashPw(pw,salt){if(!crypto.subtle)throw Error('Local demo accounts need https or localhost.');let k=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw),'PBKDF2',false,['deriveBits']),b=await crypto.subtle.deriveBits({name:'PBKDF2',salt:new TextEncoder().encode(salt),iterations:150000,hash:'SHA-256'},k,256);return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
-const UK='thrive_demo_users',SK='thrive_demo_session',CK='thrive_supabase_config';const SB_URL='https://wwxdfbdynvoqlaamxwdw.supabase.co',SB_KEY='sb_publishable_IjguhHcSN6tbtTo5L-1Qhw_yFFVvLNL';let mode='login',email='',db=null,page='dashboard',supabaseClient=null,cloudMode=false,cloudConfigured=false;
+const UK='thrive_demo_users',SK='thrive_demo_session',CK='thrive_supabase_config';const SB_URL='https://wwxdfbdynvoqlaamxwdw.supabase.co',SB_KEY='sb_publishable_IjguhHcSN6tbtTo5L1-Qhw_yFFVvLNL';let mode='login',email='',db=null,page='dashboard',supabaseClient=null,cloudMode=false,cloudConfigured=false;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fresh=(name,email)=>({profile:{name,email,currency:'KES',start:today()},tasks:[],health:{},meals:[],finance:[],notes:[],lessons:[],codingNotes:'',bibleDone:[],bibleNote:''});
 function users(){try{return JSON.parse(localStorage.getItem(UK)||'{}')}catch{return {}}}
