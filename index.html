@@ -563,12 +563,13 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')) addEven
   };
   window.loadCloudData=async function(user){
     const {data,error}=await supabaseClient.from('user_data').select('payload,updated_at').eq('user_id',user.id).maybeSingle();
-    if(error)throw error;
+    if(error){cloudDataReady=false;throw error;}
     const cacheKey='thrive_cache_'+(user.email||email||'');
     let local=null;
     try{local=JSON.parse(localStorage.getItem(cacheKey)||'null')}catch(e){}
     const dirty=localStorage.getItem(dirtyKeyV8());
     if(data?.payload){
+      cloudDataReady=true;
       if(local&&dirty){setSync('Local edits waiting to sync');return local;}
       localStorage.setItem(syncedKeyV8(),data.updated_at||'');
       localStorage.removeItem(dirtyKeyV8());
@@ -580,6 +581,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')) addEven
     const up=await supabaseClient.from('user_data').upsert({user_id:user.id,payload:created,updated_at:stamp},{onConflict:'user_id'});
     if(up.error)throw up.error;
     localStorage.setItem(syncedKeyV8(),stamp);
+    cloudDataReady=true;
     return created;
   };
   window.flushCloud=async function(){
